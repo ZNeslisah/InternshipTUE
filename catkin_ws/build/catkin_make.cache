@@ -1,0 +1,2 @@
+control_package:my_robot_controller:neslisah_ros_package:perception_package:robot_navigation
+-DCATKIN_DEVEL_PREFIX=/home/neslisah/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/neslisah/catkin_ws/install -G Unix Makefiles
