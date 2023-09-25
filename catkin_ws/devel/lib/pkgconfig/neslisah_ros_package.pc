@@ -1,0 +1,8 @@
+prefix=/home/neslisah/catkin_ws/devel
+
+Name: neslisah_ros_package
+Description: Description of neslisah_ros_package
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

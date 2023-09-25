@@ -1,0 +1,8 @@
+prefix=/home/neslisah/catkin_ws/devel
+
+Name: perception_package
+Description: Description of perception_package
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
