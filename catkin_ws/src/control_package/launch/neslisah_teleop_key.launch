@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <!-- Start turtlebot3_teleop_joy node-->
+    <arg name="scan_topic" default="scan"/>
+    <arg name="teleop_key_config"  default="$(find turtlebot3_control)/config/teleop_key.yaml"/>    
+    <arg name="cmd_vel" default="cmd_vel"/>
+    <arg name="launch_prefix" default="xterm -e"/>
+    <node pkg="control_package" type="neslisah_teleop_key.py" name="neslisah_teleop_key"  output="screen" launch-prefix="$(arg launch_prefix)">
+        <rosparam file="$(arg teleop_key_config)" command="load"/>
+        <remap from="cmd_vel" to="$(arg cmd_vel)"/>
+        <remap from="scan" to="$(arg scan_topic)"/>
+    </node>
+
+    <!--
+    <include file="$(find unicycle_control)/launch/unicycle_teleop_key.launch">
+        <arg name="teleop_key_config" value="$(arg teleop_key_config)"/>
+        <arg name="cmd_vel" value="$(arg cmd_vel)"/>
+        <arg name="launch_prefix" value="$(arg launch_prefix)"/>
+    </include>
+    -->
+
+</launch>

@@ -1,0 +1,7 @@
+global_costmap:
+  global_frame: map # (string, default: "/map") The global frame for the costmap to operate in.
+  robot_base_frame: base_footprint # (string, default: "base_link") The name of the frame for the base link of the robot.
+  update_frequency: 10.0  #(double, default: 5.0) The frequency in Hz for the map to be updated.
+  publish_frequency: 10.0 # (double, default: 0.0) The frequency in Hz for the map to be publish display information.
+  transform_tolerance: 0.5 #  (double, default: 0.2) Specifies the delay in transform (tf) data that is tolerable in seconds. This parameter serves as a safeguard to losing a link in the tf tree while still allowing an amount of latency the user is comfortable with to exist in the system.
+  static_map: true # setting whether or not to use given map

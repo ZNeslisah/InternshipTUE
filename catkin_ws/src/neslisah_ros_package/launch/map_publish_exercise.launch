@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="robot_name" default="myrobocyl"/>
+
+    <!-- Launch Gazebo Stage 1 Environment -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_stage_4.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>  
+
+    <!-- Launch gazebo mocap -->
+    <arg name="mocap_rate" default="50" />
+    <include file="$(find gazebo_mocap)/launch/gazebo_mocap.launch">
+        <arg name="mocap_rate" value="$(arg mocap_rate)"/>
+    </include>
+
+	<!-- Occupancy grid map file -->
+    <arg name="map_file" default="$(find perception_package)/maps/robot_ogm_temp.yaml"/>
+    <arg name="map_topic" default="$(arg robot_name)/map"/>
+
+	
+	<!-- Launch the map_saver node -->
+	<node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)">
+        <remap from="map" to="$(arg map_topic)"/>
+        <remap from="map_metadata" to="$(arg map_topic)_metadata"/>
+        <param name="frame_id" value="$(arg robot_name)/map"/>
+    </node>
+
+    <!-- Launch rviz for visualizing OGM -->
+    <arg name='fixed_frame' default="world"/>
+    <arg name="scan_topic" default="$(arg robot_name)/scan"/> 
+    <arg name="pose_topic" default="mocap/$(arg robot_name)/pose"/>
+    <arg name="rviz_file" default="$(find occupancy_grid_mapping)/rviz/ogm_robot.rviz"/>
+
+	<node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(arg rviz_file) -f $(arg fixed_frame)">
+        <remap from="scan" to="$(arg scan_topic)"/>
+        <remap from="/mocap/robot_name/pose" to="$(arg pose_topic)"/>
+    </node>
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find perception_package)/maps/global_costmap_params.yaml" command="load" ns="move_base" />
+    <rosparam file="$(find perception_package)/maps/planner_params.yaml" command="load" ns="move_base" />
+    <param name="frame_id" value="$(arg robot_name)/map"/>
+    </node>
+
+
+    <!-- Launch RoboCyl Model-->
+    <arg name="color" default="Gazebo/DarkGrey"/> 
+    <arg name="radius" default = "0.15"/>
+    <arg name="height" default = "0.3"/>
+    <arg name="x" default="0.0"/>
+    <arg name="y" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+    <include file="$(find robot_simulate)/launch/robocyl.launch">
+        <arg name="name" value="$(arg robot_name)"/>
+        <arg name="color" value="$(arg color)"/>
+        <arg name="radius" value="$(arg radius)"/>map
+        <arg name="height" value="$(arg height)"/>
+        <arg name="x" value="$(arg x)"/>
+        <arg name="y" value="$(arg y)"/>
+        <arg name="yaw" value="$(arg yaw)"/>
+    </include>
+
+    <!-- Launch position keyboard teleoperation --> 
+    <arg name="enable_teleop_key" value="True"/>
+    <group if="$(arg enable_teleop_key)">
+        <include file="$(find pose_tools)/launch/position_teleop_key.launch" ns="$(arg robot_name)">
+            <arg name="initial_position" value="[$(arg x), $(arg y), 0.0]"/>
+            <arg name="step_size" value="0.1"/>
+            <arg name="rate" value="10"/>
+            <arg name="launch_prefix" value="xterm -e"/>
+        </include>
+    </group> 
+
+</launch>
+
+
+  

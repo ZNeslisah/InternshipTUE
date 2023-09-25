@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="robot_name" default="myturtlebot"/>
+
+    <!-- Launch Gazebo Stage 1 Environment -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_stage_4.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>  
+
+    <!-- Launch gazebo mocap -->
+    <arg name="mocap_rate" default="50" />
+    <include file="$(find gazebo_mocap)/launch/gazebo_mocap.launch">
+        <arg name="mocap_rate" value="$(arg mocap_rate)"/>
+    </include>
+
+	<!-- Occupancy grid map file -->
+    <arg name="map_file" default="$(find perception_package)/maps/robot_ogm_temp.yaml"/>
+	
+	<!-- Launch the map_server node -->
+	<node pkg="map_server" type="map_server" name="map_server"  ns="$(arg robot_name)" args="$(arg map_file)">
+        <remap from="map" to="map"/>
+        <remap from="map_metadata" to="map_metadata"/>
+        <param name="frame_id" value="$(arg robot_name)/map"/>
+    </node>
+
+    <!-- Launch rviz for visualizing OGM -->
+    <arg name='fixed_frame' default="world"/>
+    <arg name="scan_topic" default="$(arg robot_name)/scan"/> 
+    <arg name="pose_topic" default="mocap/$(arg robot_name)/pose"/>
+    <arg name="rviz_file" default="$(find occupancy_grid_mapping)/rviz/ogm_robot.rviz"/>
+
+	<node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(arg rviz_file) -f $(arg fixed_frame)">
+        <remap from="scan" to="$(arg scan_topic)"/>
+        <remap from="/mocap/robot_name/pose" to="$(arg pose_topic)"/>
+    </node>
+
+
+	<!-- Launch global planner -->
+	<node pkg="global_planner" type="planner" name="planner" ns="$(arg robot_name)">
+		<rosparam command="load" file="$(find robot_navigation)/config/costmap_params.yaml" ns="costmap" />
+		<rosparam command="load" file="$(find robot_navigation)/config/planner_params.yaml" ns="planner" />
+	</node>
+
+	<!-- Remap the RViz 2D Nav Goal button topic to specify the planner goal -->
+	<remap from="/move_base_simple/goal" to="/planner/goal"/>
+
+
+
+    <!-- <arg name="odom_frame_id" default="myturtlebot/odom" />
+    <arg name="base_frame_id" default="myturtlebot/base_footprint" />
+    <arg name="global_frame_id" default="myturtlebot/map" />
+    <arg name="odom_topic" default="myturtlebot/odom" />
+    <arg name="laser_topic" default="myturtlebot/scan" /> -->
+    <!-- <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        <rosparam file="$(find perception_package)/maps/global_costmap_params.yaml" command="load" ns="move_base"/>
+        <rosparam file="$(find perception_package)/maps/planner_params.yaml" command="load" ns="move_base" />
+        <param name="frame_id" value="$(arg robot_name)/map"/>
+
+        
+        <param name="base_global_planner" value="navfn/NavfnROS"/>
+        <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
+        <rosparam file="$(find perception_package)/maps/costmap_common_params_waffle.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find perception_package)/maps/costmap_common_params_waffle.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find perception_package)/maps/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find perception_package)/maps/dwa_local_planner_params_waffle.yaml" command="load" />
+
+
+        <param name="global_costmap/global_frame" value="$(arg global_frame_id)" />
+        <param name="global_costmap/robot_base_frame" value="$(arg base_frame_id)" />
+        <param name="local_costmap/global_frame" value="$(arg odom_frame_id)" />
+        <param name="local_costmap/robot_base_frame" value="$(arg base_frame_id)" />
+        <param name="DWAPlannerROS/global_frame_id" value="$(arg odom_frame_id)" />
+
+    </node> -->
+
+
+     <!-- Launch TurtleBot3 robot-->
+
+    <arg name="name" default="$(arg robot_name)" />
+    <arg name="x" default="-2.0"/>
+    <arg name="y" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+    <include file="$(find turtlebot3_simulate)/launch/turtlebot3.launch">
+        <arg name="name" value="$(arg name)"/>
+        <arg name="x" value="$(arg x)"/>
+        <arg name="y" value="$(arg y)"/>
+        <arg name="yaw" value="$(arg yaw)"/>
+    </include>
+
+
+
+</launch>
+

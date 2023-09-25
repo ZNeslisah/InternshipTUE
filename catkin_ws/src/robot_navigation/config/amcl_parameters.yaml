@@ -1,0 +1,50 @@
+# http://www.ros.org/wiki/amcl
+# The commented value is the default per the wiki
+  
+# Overall filter parameters
+min_particles:        100       # 100 (amcl default)
+max_particles:        5000      # 5000 (amcl default)
+kld_err:              0.01      # 0.01 (amcl default)
+kld_z:                0.99      # 0.99 (amcl default)
+update_min_d:         0.2       # 0.2 (amcl default)
+update_min_a:         0.2       # pi/6.0 (amcl default)
+resample_interval:    2         # 2 (amcl default)
+transform_tolerance:  0.1       # 0.1 (amcl default)
+recovery_alpha_slow:  0.0       # 0.0 (amcl default)
+recovery_alpha_fast:  0.0       # 0.0 (amcl default)
+initial_pose_x:       0.0       # 0.0 (amcl default)
+initial_pose_y:       0.0       # 0.0 (amcl default)
+initial_pose_a:       0.0       # 0.0 (amcl default)
+initial_cov_xx:       0.25      # 0.25 (amcl default)
+initial_cov_yy:       0.25      # 0.25 (amcl default)
+initial_cov_aa:       0.06853   # 0.06853 (amcl default)
+gui_publish_rate:     50.0      # -1.0 (amcl default)
+save_pose_rate:       0.5       # 0.5 (amcl default)
+use_map_topic:        true      # false (amcl default)
+first_map_only:       false     # false (amcl default)
+selective_resampling: false     # false (amcl default)
+
+# Laser Model Parameters 
+laser_min_range:            -1.0   # -1.0 (amcl default)
+laser_max_range:            2.0    # -1.0 (amcl default) NOT ALLOWED TO CHANGE
+laser_max_beams:            30     # 30 (amcl default)
+laser_z_hit:                0.95   # 0.95 (amcl default)
+laser_z_short:              0.1    # 0.1 (amcl default)
+laser_z_max:                0.05   # 0.05 (amcl default)
+laser_z_rand:               0.05   # 0.05 (amcl default)
+laser_sigma_hit:            0.2    # 0.2 (amcl default)
+laser_lambda_short:         0.1    # 0.1 (amcl default)
+laser_likelihood_max_dist:  2.0    # 2.0 (amcl default)
+laser_model_type:           likelihood_field # likelihood_field (amcl default)
+
+# Odometery model parameters
+odom_model_type:  diff           # diff (amcl default)
+odom_alpha1:      0.2            # 0.2 (amcl default)
+odom_alpha2:      0.2            # 0.2 (amcl default)
+odom_alpha3:      0.2            # 0.2 (amcl default)
+odom_alpha4:      0.2            # 0.2 (amcl default)
+odom_alpha5:      0.2            # 0.2 (amcl default)
+odom_frame_id:    odom           # odom (amcl default)
+base_frame_id:    base_footprint # base_link (amcl default)
+global_frame_id:  map            # map (amcl default)
+tf_broadcast:     true           # true (amcl default)

@@ -1,0 +1,7 @@
+global_costmap:
+#  global_frame: /map   İlk hali
+#  robot_base_frame: /base_link
+  global_frame: myturtlebot/map  
+  robot_base_frame: myturtlebot/base_link
+  update_frequency: 5.0
+  static_map: true

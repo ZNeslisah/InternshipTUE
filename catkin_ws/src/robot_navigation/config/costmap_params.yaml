@@ -1,0 +1,39 @@
+# Coordinate frame and tf parameters
+global_frame: myturtlebot/map # (string, default: "/map") The global frame for the costmap to operate in.
+robot_base_frame: myturtlebot/base_link # (string, default: "base_link") The name of the frame for the base link of the robot.
+transform_tolerance: 0.2 # (double, default: 0.2) Specifies the delay in transform (tf) data that is tolerable in seconds.
+
+# Rate parameters
+update_frequency: 5.0 # (double, default: 5.0) The frequency in Hz for the map to be updated.
+publish_frequency: 0.0 # (double, default: 0.0) The frequency in Hz for the map to be publish display information.
+
+# Map management parameters
+rolling_window: false # (bool, default: false) Whether or not to use a rolling window version of the costmap. If the static_map parameter is set to true, this parameter must be set to false.
+always_send_full_costmap: true, # (bool, default: false) If true the full costmap is published to "~<name>/costmap" every update. If false only the part of the costmap that has changed is published on the "~<name>/costmap_updates" topic.
+
+# Robot Footprint or Radius
+# robot_radius: 0.17
+footprint: [[-0.205, -0.155], [-0.205, 0.155], [0.077, 0.155], [0.077, -0.155]]
+
+
+# Plugins: Sequence of plugin specifications, one per layer.
+# Each specification is a dictionary with name and type fields.
+# The name is used to define the parameter namespace for the plugin.
+plugins:
+    - {name: static_layer, type: "costmap_2d::StaticLayer"}
+    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+
+static_layer:
+    map_topic: map # (string, default: "map") The topic that the costmap subscribes to for the static map. This parameter is useful when you have multiple costmap instances within a single node that you want to use different static maps
+    first_map_only: false # (bool, default: false) Only subscribe to the first message on the map topic, ignoring all subsequent messages
+    subscribe_to_updates: false # (bool, default: false) In addition to map_topic, also subscribe to map_topic + "_updates"
+    lethal_cost_threshold: 230 # (int, default: 100) The threshold value at which to consider a cost lethal when reading in a map from the map server.
+    unknown_cost_value: -1 # (int, default: -1) The value for which a cost should be considered unknown when reading in a map from the map server. If the costmap is not tracking unknown space, costs of this value will be considered occupied. A value of zero also results in this parameter being unused.
+    trinary_costmap: true #  (bool, default: true) If true, translates all map message values to NO_INFORMATION/FREE_SPACE/LETHAL_OBSTACLE (three values). If false, a full spectrum of intermediate values is possible.
+    track_unknown_space: true # (bool, default: true) If true, unknown values in the map messages are translated directly to the layer. Otherwise, unknown values in the map message are translated as FREE_SPACE in the layer.
+    use_maximum: false # (bool, default: false) Only matters if the static layer is not the bottom layer. If true, only the maximum value will be written to the master costmap.
+
+inflation_layer:
+    inflation_radius: 1.0 #  (double, default: 0.55) The radius in meters to which the map inflates obstacle cost values.
+    cost_scaling_factor: 5.0 # (double, default: 10.0) A scaling factor to apply to cost values during inflation
+    inflate_unknown: false # (bool, default: false) "Whether to inflate unknown cells.

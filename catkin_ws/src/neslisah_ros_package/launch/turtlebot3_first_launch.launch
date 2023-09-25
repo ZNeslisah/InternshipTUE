@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <!-- Launch Gazebo Stage 1 Environment -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_stage_4.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>  
+
+    <!-- Launch gazebo mocap -->
+    <arg name="mocap_rate" default="50" />
+    <include file="$(find gazebo_mocap)/launch/gazebo_mocap.launch">
+        <arg name="mocap_rate" value="$(arg mocap_rate)"/>
+    </include>
+
+     <!-- Launch TurtleBot3 robot-->
+    <arg name="name" default="$(optenv TURTLEBOT3_NAME turtlebot)" />
+    <arg name="x" default="-2.0"/>
+    <arg name="y" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+    <include file="$(find turtlebot3_simulate)/launch/turtlebot3.launch">
+        <arg name="name" value="$(arg name)"/>
+        <arg name="x" value="$(arg x)"/>
+        <arg name="y" value="$(arg y)"/>
+        <arg name="yaw" value="$(arg yaw)"/>
+    </include>
+
+   <!--
+     Launch TurtleBot3 keyboard teleoperation 
+    <include file="$(find turtlebot3_control)/launch/turtlebot3_teleop_key.launch" ns="$(arg name)">
+        <arg name="cmd_vel" value="cmd_vel_key"/>
+    </include>
+    -->
+
+	<!-- Set TurtleBot model -->
+    <arg name="turtlebot_model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+	<arg name="robot_name" default="$(optenv TURTLEBOT3_NAME turtlebot)"/>
+
+	<!-- Turtlebot3 topic/frame settings for occupancy grid mapping -->
+    <arg name="map_topic" 		default="$(arg robot_name)/map"/>
+    <arg name="map_frame" 		default="$(arg robot_name)/map"/>
+    <arg name="odom_frame" 		default="$(arg robot_name)/odom"/>
+    <arg name="base_frame" 		default="$(arg robot_name)/base_footprint"/>
+	<arg name="scan_topic"     	default="$(arg robot_name)/scan"/>
+
+	<!-- Load occupancy grid mapping parameters -->
+	<arg name="params_folder" default="$(find turtlebot3_mapping)/config"/>
+	<arg name="params_filename" default="mapping_params.yaml"/>
+
+
+	<!-- Launch occupancy grid mapping for Turtlebot3 -->
+	<include file="$(find turtlebot3_mapping)/launch/turtlebot3_mapping.launch">
+		<arg name="robot_name" 		value="$(arg robot_name)"/>
+		<arg name="map_topic" default="$(arg map_topic)"/>
+		<arg name="map_frame" default="$(arg map_frame)"/>
+		<arg name="odom_frame" default="$(arg odom_frame)"/>
+		<arg name="base_frame" default="$(arg base_frame)"/>
+		<arg name="scan_topic" default="$(arg scan_topic)"/>
+		<arg name="params_folder" default="$(arg params_folder)"/>
+		<arg name="params_filename" default="$(arg params_filename)"/>
+	</include>
+
+</launch>

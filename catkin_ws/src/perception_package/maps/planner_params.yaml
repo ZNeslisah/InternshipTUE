@@ -1,0 +1,4 @@
+base_global_planner: "navfn/NavfnROS"
+planner_patience: 5.0
+
+

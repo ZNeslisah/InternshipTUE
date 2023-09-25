@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="robot_name" default="myrobocyl"/>
+
+    <!-- Launch Gazebo Stage 1 Environment -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_stage_4.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>  
+
+    <!-- Launch gazebo mocap -->
+    <arg name="mocap_rate" default="50" />
+    <include file="$(find gazebo_mocap)/launch/gazebo_mocap.launch">
+        <arg name="mocap_rate" value="$(arg mocap_rate)"/>
+    </include>
+
+    <!-- Launch RoboCyl Model-->
+    <arg name="color" default="Gazebo/DarkGrey"/> <!-- see http://wiki.ros.org/simulator_gazebo/Tutorials/ListOfMaterials for Gazebo materials -->
+    <arg name="radius" default = "0.15"/>
+    <arg name="height" default = "0.3"/>
+    <arg name="x" default="0.0"/>
+    <arg name="y" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+    <include file="$(find robot_simulate)/launch/robocyl.launch">
+        <arg name="name" value="$(arg robot_name)"/>
+        <arg name="color" value="$(arg color)"/>
+        <arg name="radius" value="$(arg radius)"/>
+        <arg name="height" value="$(arg height)"/>
+        <arg name="x" value="$(arg x)"/>
+        <arg name="y" value="$(arg y)"/>
+        <arg name="yaw" value="$(arg yaw)"/>
+    </include>
+
+    <!-- Launch position keyboard teleoperation --> 
+    <arg name="enable_teleop_key" value="True"/>
+    <group if="$(arg enable_teleop_key)">
+        <include file="$(find pose_tools)/launch/position_teleop_key.launch" ns="$(arg robot_name)">
+            <arg name="initial_position" value="[$(arg x), $(arg y), 0.0]"/>
+            <arg name="step_size" value="0.1"/>
+            <arg name="rate" value="10"/>
+            <arg name="launch_prefix" value="xterm -e"/>
+        </include>
+    </group> 
+
+    <!-- Load occupancy grid mapping parameters -->
+
+    <arg name="map_topic" 		default="map"/>
+    <arg name="scan_topic"     	default="scan"/>
+
+    <arg name="map_frame" 		default="$(arg robot_name)/map"/>
+    <arg name="odom_frame" 		default="$(arg robot_name)/odom"/>
+    <arg name="base_frame" 		default="$(arg robot_name)/base_footprint"/>
+	
+    <arg name="config_occupancy_grid_mapping" default="$(find occupancy_grid_mapping)/config/occupancy_grid_mapping.yaml"/>
+	
+
+    <rosparam command="load" file="$(arg config_occupancy_grid_mapping)" ns="$(arg robot_name)"/>
+    <rosparam param="$(arg robot_name)/map/global_frame_id" subst_value="True">$(arg map_frame)</rosparam>
+    <rosparam param="$(arg robot_name)/map/odom_frame_id" subst_value="True">$(arg odom_frame)</rosparam>
+    <rosparam param="$(arg robot_name)/scan/frame_id" subst_value="True">$(arg base_frame)</rosparam>
+
+
+	<!--Load Occupancy grid mapping node-->
+    <node pkg="occupancy_grid_mapping" type="occupancy_grid_mapping_node.py" name="occupancy_grid_mapping" ns="$(arg robot_name)" output="screen">
+        <remap from="scan" to="$(arg scan_topic)"/>
+        <remap from="map" to="$(arg map_topic)"/>
+	</node>
+	
+
+    <include file="$(find occupancy_grid_mapping)/launch/rviz_map.launch">
+        <arg name="robot_name" value="$(arg robot_name)"/>
+    </include>
+ 
+	
+</launch>
+
+

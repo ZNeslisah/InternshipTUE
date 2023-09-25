@@ -1,0 +1,23 @@
+map_type: costmap # select costmap to use between voxel(voxel-grid) and costmap(costmap_2d)
+
+# External dimension of the robot is provided as polygons in several points
+footprint: [[-0.205, -0.155], [-0.205, 0.155], [0.077, 0.155], [0.077, -0.155]]
+# radius of the robot. Use the above footprint setting instead of robot_radius.
+#robot_radius: 0.17
+
+# Obstacle Layer Parameters
+obstacle_range: 3.0 # (double, default: 2.5) Indicate the object as an obstacle when the distance between the robot and obstacle is within this range. The default maximum distance from the robot at which an obstacle will be inserted into the cost map in meters.
+raytrace_range: 3.5 # (double, default: 3.0) Sensor value that exceeds this range will be indicated as a freespace. The default range in meters at which to raytrace out obstacles from the map using sensor data.
+observation_sources: scan #  (string, default: "") A list of observation source names separated by spaces that specify which sensor to use
+# set data type and topic, marking status, minimum obstacle for the laser scan
+scan: {
+    topic: scan, # (string, default: source_name) The topic on which sensor data comes in for this source.
+    data_type: LaserScan, # (string, default: "PointCloud") The data type associated with the topic, right now only "PointCloud", "PointCloud2", and "LaserScan" are supported.
+    sensor_frame: base_scan, # (string, default: "") The frame of the origin of the sensor. Leave empty to attempt to read the frame from sensor data. The frame can be read from both sensor_msgs/LaserScan, sensor_msgs/PointCloud, and sensor_msgs/PointCloud2 messages.
+    clearing: true, # (bool, default: false) Whether or not this observation should be used to clear out freespace.
+    marking: true,  # (bool, default: true) Whether or not this observation should be used to mark obstacles.
+    }
+
+# Inflation Layer Parameters
+inflation_radius: 1.0 # (double, default: 0.55) The radius in meters to which the map inflates obstacle cost values to prevent collision with obstacles.
+cost_scaling_factor: 5.0 # (double, default: 10.0)  A scaling factor to apply to cost values during inflation, where scaling =  exp(-1.0 * cost_scaling_factor *(distance_from_obstacle - inscribed_radius)) *(254 - 1)

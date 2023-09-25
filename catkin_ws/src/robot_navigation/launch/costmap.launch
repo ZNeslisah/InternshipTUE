@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- Launch map server -->
+  <arg name="map_file" 	default="$(find robot_navigation)/maps/turtlebot_world_map.yaml"/>
+  <node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)"/>
+
+  <!-- Publish static transform from global frame to the robot_base_frame -->
+  <arg name="global_frame" default="/map" />
+  <arg name="robot_base_frame" default="/base_link"/>
+  <arg name="tf_position" default="-2 0 0" />
+  <arg name="tf_orientation" default="0 0 0"/>
+  <arg name="tf_period_in_ms" default="100"/>
+  <node pkg="tf" type="static_transform_publisher" name="map_to_base_link"
+      args="$(arg tf_position) $(arg tf_orientation) $(arg global_frame) $(arg robot_base_frame) $(arg tf_period_in_ms)" />
+
+  <!-- Launch the costmap node with relevant parameters -->
+  <node pkg="costmap_2d" type="costmap_2d_node" name="costmap_node"  >
+    <rosparam command="load" file="$(find robot_navigation)/config/costmap_params.yaml" ns="costmap" />
+  </node>
+
+  <!-- Launch RViz  for visualization -->
+  <arg name="rviz_file" default="$(find robot_navigation)/rviz/costmap.rviz"/>
+  <node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(arg rviz_file)"/>
+
+</launch>
